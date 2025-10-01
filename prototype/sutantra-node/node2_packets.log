@@ -1,0 +1,49 @@
+2025-09-27T12:29:40.641025Z  INFO sutantra_node: 🚀 Starting Sutantra full node on port 30334
+2025-09-27T12:29:40.641219Z  INFO sutantra_node: 📡 Validator mode: true
+2025-09-27T12:29:40.641253Z  INFO sutantra_node: 🎥 Streaming relay: true
+2025-09-27T12:29:40.641268Z  INFO sutantra_node::integration::node: 🚀 Starting Sutantra Full Node
+2025-09-27T12:29:40.641280Z  INFO sutantra_node::integration::node: 📡 Port: 30334
+2025-09-27T12:29:40.641289Z  INFO sutantra_node::integration::node: ⚡ Validator: true
+2025-09-27T12:29:40.641298Z  INFO sutantra_node::integration::node: 🎥 Streaming: true
+2025-09-27T12:29:40.641318Z  INFO sutantra_node::blockchain::engine: 🔗 Initializing Blockchain Engine
+2025-09-27T12:29:40.641337Z  INFO sutantra_node::streaming::engine: 🎥 Initializing Streaming Engine
+2025-09-27T12:29:40.641349Z  INFO sutantra_node::streaming::engine: 📡 WebRTC port: 31334
+2025-09-27T12:29:40.641359Z  INFO sutantra_node::streaming::engine: 📺 Max streams: 100
+2025-09-27T12:29:40.641369Z  INFO sutantra_node::streaming::engine: 🎥 SELECTED: REAL WebRTC Engine (Production Mode)
+2025-09-27T12:29:40.641380Z  INFO sutantra_node::streaming::engine: 📡 Initializing webrtc-rs crate v0.7.3
+2025-09-27T12:29:40.641390Z  INFO sutantra_node::streaming::real_webrtc_fixed: 🎥 Initializing REAL WebRTC Engine on port 31334
+2025-09-27T12:29:40.641404Z  INFO sutantra_node::streaming::real_webrtc_fixed: 🔧 WebRTC Mode: PRODUCTION (not simulation)
+2025-09-27T12:29:40.641559Z  INFO sutantra_node::streaming::real_webrtc_fixed: 🚀 Starting REAL WebRTC Engine
+2025-09-27T12:29:40.641589Z  INFO sutantra_node::streaming::real_webrtc_fixed: 📡 STUN Servers: [["stun:global.stun.twilio.com:3478"], ["stun:stun.relay.metered.ca:80"], ["stun:stun.l.google.com:19302"], ["stun:stun.cloudflare.com:3478"]]
+2025-09-27T12:29:40.641612Z  INFO sutantra_node::streaming::real_webrtc_fixed: 🎬 Ready for VP8 video streaming
+2025-09-27T12:29:40.641625Z  INFO sutantra_node::streaming::real_webrtc_fixed: 🔄 Starting WebRTC connection manager
+2025-09-27T12:29:40.641799Z  INFO sutantra_node::integration::node: ✅ All components started successfully
+2025-09-27T12:29:40.641983Z  INFO sutantra_node::blockchain::engine: 🚀 Starting Blockchain Engine
+2025-09-27T12:29:40.642058Z  INFO sutantra_node::blockchain::engine: 📁 Data directory: ./data/blockchain_30334
+2025-09-27T12:29:40.642082Z  INFO sutantra_node::blockchain::engine: ⚡ Validator mode: true
+2025-09-27T12:29:40.642136Z  INFO sutantra_node::blockchain::engine: ⛏️  Starting block production
+2025-09-27T12:29:40.642955Z  INFO sutantra_node::streaming::engine: 🚀 Starting Streaming Engine
+2025-09-27T12:29:40.643189Z  INFO sutantra_node::integration: 🌉 Starting Event Bridge
+2025-09-27T12:29:41.644508Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:42.645718Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:43.647115Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:44.648891Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:45.649956Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:46.643335Z DEBUG sutantra_node::blockchain::engine: 🧱 Produced block #1
+2025-09-27T12:29:46.650799Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:47.652069Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:48.652701Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:49.654196Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:50.654538Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:51.655762Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:52.645140Z DEBUG sutantra_node::blockchain::engine: 🧱 Produced block #2
+2025-09-27T12:29:52.657543Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:53.659223Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:54.663590Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:55.675293Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:56.678388Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:57.680427Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:58.646016Z DEBUG sutantra_node::blockchain::engine: 🧱 Produced block #3
+2025-09-27T12:29:58.682283Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:29:59.684294Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running
+2025-09-27T12:30:00.686776Z DEBUG sutantra_node::streaming::engine: 🔄 WebRTC connection handler running

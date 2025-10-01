@@ -1,0 +1,12 @@
+/home/abhi/sutantra/prototype/sutantra-node/target/release/deps/anstyle-d5a5d2afaaaebd6b.d: /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/lib.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/macros.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/color.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/effect.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/reset.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/style.rs
+
+/home/abhi/sutantra/prototype/sutantra-node/target/release/deps/libanstyle-d5a5d2afaaaebd6b.rlib: /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/lib.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/macros.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/color.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/effect.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/reset.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/style.rs
+
+/home/abhi/sutantra/prototype/sutantra-node/target/release/deps/libanstyle-d5a5d2afaaaebd6b.rmeta: /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/lib.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/macros.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/color.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/effect.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/reset.rs /home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/style.rs
+
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/lib.rs:
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/macros.rs:
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/color.rs:
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/effect.rs:
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/reset.rs:
+/home/abhi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.11/src/style.rs:
