@@ -1,0 +1,245 @@
+# Sutantra Decentralized Streaming Platform - .gitignore
+
+# ============================================================================
+# RUST BUILD ARTIFACTS
+# ============================================================================
+
+# Cargo build directory
+target/
+Cargo.lock
+
+# Rust backup files
+**/*.rs.bk
+
+# ============================================================================
+# NODE DATA & LOGS
+# ============================================================================
+
+# Node data directories
+data/
+blockchain_*/
+node_data/
+validator_data/
+
+# Log files
+*.log
+logs/
+node*.log
+node*_*.log
+streaming*.log
+blockchain*.log
+
+# Demo and test artifacts
+demo_*.log
+test_*.log
+packet_*.log
+
+# ============================================================================
+# BLOCKCHAIN & STREAMING DATA
+# ============================================================================
+
+# Blockchain state
+*.db
+*.sqlite
+*.sqlite3
+rocksdb/
+leveldb/
+
+# Stream data
+streams/
+stream_data/
+video_cache/
+media_cache/
+
+# Keys and secrets (IMPORTANT: Never commit these!)
+*.key
+*.pem
+private_keys/
+validator_keys/
+node_keys/
+keystore/
+
+# ============================================================================
+# DEVELOPMENT & IDE
+# ============================================================================
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================================================
+# TEMPORARY & CACHE FILES
+# ============================================================================
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache directories
+.cache/
+cache/
+
+# ============================================================================
+# NETWORK & P2P DATA
+# ============================================================================
+
+# P2P network data
+peers.dat
+network_state/
+p2p_data/
+
+# STUN/ICE connection data
+ice_candidates/
+webrtc_sessions/
+
+# ============================================================================
+# TESTING & BENCHMARKS
+# ============================================================================
+
+# Test artifacts
+test_results/
+benchmark_results/
+performance_logs/
+
+# Coverage reports
+coverage/
+*.profraw
+
+# ============================================================================
+# DOCUMENTATION BUILD
+# ============================================================================
+
+# Generated documentation
+book/
+mdbook/
+target/doc/
+
+# ============================================================================
+# DEPLOYMENT & PACKAGING
+# ============================================================================
+
+# Docker artifacts (if added later)
+.dockerignore
+docker-compose.override.yml
+
+# Release packages
+*.tar.gz
+*.zip
+releases/
+
+# ============================================================================
+# ENVIRONMENT & CONFIG
+# ============================================================================
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Local configuration overrides
+config.local.toml
+app.local.toml
+node.local.toml
+
+# ============================================================================
+# WEBRTC & STREAMING SPECIFIC
+# ============================================================================
+
+# WebRTC debug files
+webrtc_debug/
+rtc_logs/
+
+# Video/Audio test files
+*.mp4
+*.webm
+*.ogg
+*.wav
+test_media/
+
+# Streaming session data
+sessions/
+stream_sessions/
+
+# ============================================================================
+# BLOCKCHAIN SPECIFIC
+# ============================================================================
+
+# Genesis files (keep template, ignore generated)
+genesis.json
+!genesis.template.json
+
+# Validator state
+priv_validator_key.json
+priv_validator_state.json
+node_key.json
+
+# Consensus state
+cs.wal/
+evidence.db/
+
+# ============================================================================
+# PERFORMANCE & MONITORING
+# ============================================================================
+
+# Performance monitoring
+flamegraph.svg
+perf.data*
+*.prof
+
+# Memory dumps
+*.hprof
+core.*
+
+# ============================================================================
+# BACKUP FILES
+# ============================================================================
+
+# Backup files
+*.bak
+*.backup
+*~
+.#*
+#*#
+
+# ============================================================================
+# PROJECT SPECIFIC IGNORES
+# ============================================================================
+
+# Demo scripts output
+demo_output/
+test_output/
+
+# Generated reports
+*_SUCCESS_REPORT.md
+*_COMPLETION_SUMMARY.md
+REAL_WEBRTC_*.md
+
+# Temporary demo files
+demo_real_webrtc_streaming.sh.backup
+demo_packet_transmission.sh.backup
+
+# ============================================================================
+# FUTURE ADDITIONS (Commented for reference)
+# ============================================================================
+
+# Uncomment if adding these features later:
+# mobile/build/
+# web/node_modules/
+# web/dist/
+# contracts/artifacts/
+# contracts/cache/
+
