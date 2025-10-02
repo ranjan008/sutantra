@@ -1,0 +1,26 @@
+{
+  "name": "sutantra",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test_websocket_stream.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ranjan008/sutantra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ranjan008/sutantra/issues"
+  },
+  "homepage": "https://github.com/ranjan008/sutantra#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.55.1"
+  }
+}
