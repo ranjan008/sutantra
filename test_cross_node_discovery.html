@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cross-Node Stream Discovery</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { margin: 5px; padding: 10px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Cross-Node Stream Discovery Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Create Stream on Streamer Node (8080)</h2>
+        <button onclick="createStream()">Create Test Stream</button>
+        <div id="createResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Check Streams on Streamer Node</h2>
+        <button onclick="checkStreamerStreams()">Check Streamer API</button>
+        <div id="streamerResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Discover Streams from Viewer Node (8081)</h2>
+        <button onclick="discoverFromViewer()">Discover from Viewer</button>
+        <div id="viewerResult" class="result"></div>
+    </div>
+
+    <script>
+        let streamerWs = null;
+        let viewerWs = null;
+
+        function log(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = `result ${isError ? 'error' : 'success'}`;
+        }
+
+        async function createStream() {
+            try {
+                // Connect to streamer WebSocket
+                streamerWs = new WebSocket('ws://localhost:8080/ws');
+                
+                streamerWs.onopen = () => {
+                    console.log('Connected to streamer WebSocket');
+                    
+                    // Send handshake
+                    streamerWs.send(JSON.stringify({
+                        type: 'handshake',
+                        data: { node_type: 'streamer' }
+                    }));
+                };
+                
+                streamerWs.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    console.log('Streamer message:', message);
+                    
+                    if (message.type === 'handshakeResponse') {
+                        // Create stream
+                        streamerWs.send(JSON.stringify({
+                            type: 'createStream',
+                            data: {
+                                title: 'Test Stream for Cross-Node Discovery',
+                                description: 'Testing cross-node stream discovery'
+                            }
+                        }));
+                    } else if (message.type === 'createStreamResponse') {
+                        if (message.data.success) {
+                            log('createResult', `✅ Stream created successfully! Stream ID: ${message.data.stream_id}`);
+                        } else {
+                            log('createResult', `❌ Failed to create stream: ${message.data.message}`, true);
+                        }
+                    }
+                };
+                
+                streamerWs.onerror = (error) => {
+                    log('createResult', `❌ WebSocket error: ${error}`, true);
+                };
+                
+            } catch (error) {
+                log('createResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function checkStreamerStreams() {
+            try {
+                const response = await fetch('http://localhost:8080/api/streams');
+                const streams = await response.json();
+                
+                if (streams.length > 0) {
+                    log('streamerResult', `✅ Found ${streams.length} streams on streamer node:<br>${JSON.stringify(streams, null, 2)}`);
+                } else {
+                    log('streamerResult', '⚠️ No streams found on streamer node', true);
+                }
+            } catch (error) {
+                log('streamerResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function discoverFromViewer() {
+            try {
+                // Connect to viewer WebSocket
+                viewerWs = new WebSocket('ws://localhost:8081/ws');
+                
+                viewerWs.onopen = () => {
+                    console.log('Connected to viewer WebSocket');
+                    
+                    // Send handshake
+                    viewerWs.send(JSON.stringify({
+                        type: 'handshake',
+                        data: { node_type: 'viewer' }
+                    }));
+                };
+                
+                viewerWs.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    console.log('Viewer message:', message);
+                    
+                    if (message.type === 'handshakeResponse') {
+                        // Request stream list
+                        viewerWs.send(JSON.stringify({
+                            type: 'requestStreamList',
+                            data: {}
+                        }));
+                    } else if (message.type === 'streamList') {
+                        const streams = message.data.streams || [];
+                        if (streams.length > 0) {
+                            log('viewerResult', `✅ Viewer discovered ${streams.length} streams:<br>${JSON.stringify(streams, null, 2)}`);
+                        } else {
+                            log('viewerResult', '⚠️ Viewer found no streams (cross-node discovery failed)', true);
+                        }
+                    }
+                };
+                
+                viewerWs.onerror = (error) => {
+                    log('viewerResult', `❌ WebSocket error: ${error}`, true);
+                };
+                
+            } catch (error) {
+                log('viewerResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
+

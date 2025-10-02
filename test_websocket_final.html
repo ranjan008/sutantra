@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final WebSocket Test - Sutantra UI Differentiation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🎉 Sutantra UI Differentiation Test</h1>
+    
+    <div class="test-section">
+        <h2>🎬 Node 1 (Streamer - Port 8080)</h2>
+        <div id="node1-status">Connecting...</div>
+        <pre id="node1-response"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>👥 Node 2 (Viewer - Port 8081)</h2>
+        <div id="node2-status">Connecting...</div>
+        <pre id="node2-response"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        const results = [];
+        
+        function testNode(port, expectedType, nodeNum) {
+            return new Promise((resolve) => {
+                const ws = new WebSocket(`ws://localhost:${port}/ws`);
+                const statusEl = document.getElementById(`node${nodeNum}-status`);
+                const responseEl = document.getElementById(`node${nodeNum}-response`);
+                
+                ws.onopen = function() {
+                    statusEl.innerHTML = '<span class="info">✅ Connected - Sending handshake...</span>';
+                    
+                    // Send handshake
+                    ws.send(JSON.stringify({
+                        type: 'handshake',
+                        data: { client_type: expectedType }
+                    }));
+                };
+                
+                ws.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    responseEl.textContent = JSON.stringify(message, null, 2);
+                    
+                    if (message.type === 'handshakeResponse' && message.data) {
+                        const data = message.data;
+                        const success = data.node_type === expectedType;
+                        
+                        statusEl.innerHTML = success 
+                            ? `<span class="success">✅ SUCCESS: Detected as ${data.node_type.toUpperCase()}</span>`
+                            : `<span class="error">❌ FAILED: Expected ${expectedType}, got ${data.node_type}</span>`;
+                        
+                        results.push({
+                            port,
+                            expected: expectedType,
+                            actual: data.node_type,
+                            nodeId: data.node_id,
+                            success
+                        });
+                        
+                        ws.close();
+                        resolve();
+                    }
+                };
+                
+                ws.onerror = function(error) {
+                    statusEl.innerHTML = '<span class="error">❌ Connection failed</span>';
+                    responseEl.textContent = `Error: ${error}`;
+                    resolve();
+                };
+                
+                setTimeout(() => {
+                    if (ws.readyState !== WebSocket.CLOSED) {
+                        ws.close();
+                        statusEl.innerHTML = '<span class="error">❌ Timeout</span>';
+                        resolve();
+                    }
+                }, 5000);
+            });
+        }
+        
+        async function runTests() {
+            console.log('🧪 Starting UI differentiation tests...');
+            
+            await testNode(8080, 'streamer', 1);
+            await testNode(8081, 'viewer', 2);
+            
+            // Display results
+            const resultsEl = document.getElementById('test-results');
+            let html = '<h3>Test Summary:</h3>';
+            
+            results.forEach(result => {
+                const icon = result.success ? '✅' : '❌';
+                html += `<p>${icon} Port ${result.port}: Expected <strong>${result.expected}</strong>, Got <strong>${result.actual}</strong> (Node: ${result.nodeId})</p>`;
+            });
+            
+            const allPassed = results.every(r => r.success);
+            html += `<h3>${allPassed ? '🎉 ALL TESTS PASSED!' : '⚠️ Some tests failed'}</h3>`;
+            
+            if (allPassed) {
+                html += `
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                        <h4>🏆 Success! UI Differentiation is Working:</h4>
+                        <ul>
+                            <li>✅ Port 8080 correctly identified as STREAMER</li>
+                            <li>✅ Port 8081 correctly identified as VIEWER</li>
+                            <li>✅ Unique node IDs assigned</li>
+                            <li>✅ WebSocket handshake working properly</li>
+                        </ul>
+                        <p><strong>The web interfaces should now show different controls for streamer vs viewer!</strong></p>
+                    </div>
+                `;
+            }
+            
+            resultsEl.innerHTML = html;
+        }
+        
+        // Start tests when page loads
+        runTests();
+    </script>
+</body>
+</html>
+

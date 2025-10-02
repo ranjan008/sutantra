@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <script>
+        const status = document.getElementById('status');
+        const messages = document.getElementById('messages');
+        
+        // Test Node 1 (Streamer)
+        const ws1 = new WebSocket('ws://localhost:8080/ws');
+        
+        ws1.onopen = function() {
+            status.innerHTML += '<br>✅ Node 1 (8080) WebSocket connected!';
+            
+            // Send handshake
+            ws1.send(JSON.stringify({
+                type: 'handshake',
+                data: { client_type: 'streamer' }
+            }));
+        };
+        
+        ws1.onmessage = function(event) {
+            const msg = JSON.parse(event.data);
+            messages.innerHTML += '<br>📨 Node 1: ' + JSON.stringify(msg);
+        };
+        
+        ws1.onerror = function(error) {
+            status.innerHTML += '<br>❌ Node 1 WebSocket error: ' + error;
+        };
+        
+        // Test Node 2 (Viewer)
+        setTimeout(() => {
+            const ws2 = new WebSocket('ws://localhost:8081/ws');
+            
+            ws2.onopen = function() {
+                status.innerHTML += '<br>✅ Node 2 (8081) WebSocket connected!';
+                
+                // Send handshake
+                ws2.send(JSON.stringify({
+                    type: 'handshake',
+                    data: { client_type: 'viewer' }
+                }));
+            };
+            
+            ws2.onmessage = function(event) {
+                const msg = JSON.parse(event.data);
+                messages.innerHTML += '<br>📨 Node 2: ' + JSON.stringify(msg);
+            };
+            
+            ws2.onerror = function(error) {
+                status.innerHTML += '<br>❌ Node 2 WebSocket error: ' + error;
+            };
+        }, 1000);
+    </script>
+</body>
+</html>
+
