@@ -23,6 +23,36 @@ pub enum NodeType {
 }
 
 impl SutantraNode {
+    pub fn get_event_sender(&self) -> mpsc::UnboundedSender<crate::integration::SutantraEvent> {
+        // Create a channel for web UI events
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        
+        // Spawn a task to handle events from web UI
+        tokio::spawn(async move {
+            while let Some(event) = rx.recv().await {
+                tracing::info!("🌐 Web UI Event: {:?}", event);
+                // TODO: Process events from web UI
+            }
+        });
+        
+        tx
+    }
+
+    pub fn get_streaming_sender(&self) -> mpsc::UnboundedSender<crate::streaming::StreamingCommand> {
+        // Create a channel for streaming commands from web UI
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        
+        // Spawn a task to handle streaming commands from web UI
+        tokio::spawn(async move {
+            while let Some(command) = rx.recv().await {
+                tracing::info!("🎬 Web UI Streaming Command: {:?}", command);
+                // TODO: Forward commands to streaming engine
+            }
+        });
+        
+        tx
+    }
+
     /// Create a new full node
     pub async fn new(port: u16, is_validator: bool, enable_streaming: bool) -> Result<Self> {
         Ok(Self {

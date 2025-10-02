@@ -12,7 +12,7 @@ pub mod node;
 pub use node::SutantraNode;
 
 /// Central event that coordinates between blockchain and streaming layers
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum SutantraEvent {
     // Blockchain → Streaming events
     StreamRegistered { stream_id: String, creator: String },
