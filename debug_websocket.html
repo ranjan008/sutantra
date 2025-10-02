@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Debug - Sutantra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1976d2; }
+        .log {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-y: auto;
+            max-height: 300px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success { color: #4caf50; }
+        .error { color: #f44336; }
+        .info { color: #2196f3; }
+        .warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🔍 WebSocket Connection Debug</h1>
+    
+    <div class="test-section">
+        <h2>📡 Connection Tests</h2>
+        <button onclick="testStreamerWS()">Test Streamer WebSocket (8080)</button>
+        <button onclick="testViewerWS()">Test Viewer WebSocket (8081)</button>
+        <button onclick="testBothNodes()">Test Both Nodes</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Connection Log</h2>
+        <div id="log" class="log">Ready to test WebSocket connections...\n</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Current Page Info</h2>
+        <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+        <p><strong>Expected WebSocket URLs:</strong></p>
+        <ul>
+            <li>Streamer: <code>ws://localhost:8080/ws</code></li>
+            <li>Viewer: <code>ws://localhost:8081/ws</code></li>
+        </ul>
+    </div>
+
+    <script>
+        let logElement = document.getElementById('log');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            logElement.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            logElement.innerHTML = 'Log cleared...\n';
+        }
+        
+        function testWebSocket(url, name) {
+            log(`🔄 Testing ${name} at ${url}`, 'info');
+            
+            try {
+                const ws = new WebSocket(url);
+                
+                ws.onopen = function(event) {
+                    log(`✅ ${name} connected successfully!`, 'success');
+                    
+                    // Send a test handshake
+                    const handshake = {
+                        type: 'handshake',
+                        data: {
+                            node_type: 'viewer',
+                            client_id: 'debug-client-' + Date.now()
+                        }
+                    };
+                    
+                    ws.send(JSON.stringify(handshake));
+                    log(`📤 Sent handshake to ${name}`, 'info');
+                };
+                
+                ws.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        log(`📥 ${name} response: ${JSON.stringify(data, null, 2)}`, 'success');
+                    } catch (e) {
+                        log(`📥 ${name} raw response: ${event.data}`, 'info');
+                    }
+                };
+                
+                ws.onerror = function(error) {
+                    log(`❌ ${name} error: ${error}`, 'error');
+                    console.error(`${name} WebSocket error:`, error);
+                };
+                
+                ws.onclose = function(event) {
+                    log(`🔌 ${name} closed: Code ${event.code}, Reason: ${event.reason || 'No reason'}`, 'warning');
+                };
+                
+                // Close connection after 5 seconds
+                setTimeout(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.close();
+                        log(`⏰ ${name} connection closed after 5 seconds`, 'info');
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                log(`💥 ${name} connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function testStreamerWS() {
+            testWebSocket('ws://localhost:8080/ws', 'Streamer Node');
+        }
+        
+        function testViewerWS() {
+            testWebSocket('ws://localhost:8081/ws', 'Viewer Node');
+        }
+        
+        function testBothNodes() {
+            log('🚀 Testing both nodes...', 'info');
+            testStreamerWS();
+            setTimeout(() => testViewerWS(), 1000);
+        }
+        
+        // Display current URL
+        document.getElementById('currentUrl').textContent = window.location.href;
+        
+        // Auto-test on load
+        window.addEventListener('load', function() {
+            log('🌐 Page loaded, ready for testing', 'info');
+            log('💡 Click "Test Both Nodes" to start debugging', 'info');
+        });
+    </script>
+</body>
+</html>
+

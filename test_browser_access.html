@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutantra Browser Access Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { border-color: #4caf50; }
+        .error { border-color: #f44336; }
+        .warning { border-color: #ff9800; }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1976d2; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success { background: #4caf50; }
+        .status.error { background: #f44336; }
+        .status.warning { background: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Sutantra Browser Access Test</h1>
+    <p>This page will help diagnose why you're getting authentication prompts.</p>
+
+    <div class="test-section">
+        <h2>📡 Node Connection Tests</h2>
+        <button onclick="testStreamerNode()">Test Streamer Node (8080)</button>
+        <button onclick="testViewerNode()">Test Viewer Node (8081)</button>
+        <button onclick="testWebSocket()">Test WebSocket Connection</button>
+        <div id="connectionResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Browser Information</h2>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Quick Fixes</h2>
+        <p><strong>Try these solutions:</strong></p>
+        <ol>
+            <li><strong>Incognito Mode:</strong> Open this page in incognito/private browsing</li>
+            <li><strong>Clear Browser Data:</strong> Clear cookies, cache, and site data for localhost</li>
+            <li><strong>Different Browser:</strong> Try Chrome, Firefox, Safari, or Edge</li>
+            <li><strong>Direct Links:</strong> 
+                <a href="http://localhost:8080/" target="_blank" style="color: #2196f3;">Streamer (8080)</a> | 
+                <a href="http://localhost:8081/" target="_blank" style="color: #2196f3;">Viewer (8081)</a>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Diagnostic Information</h2>
+        <div id="diagnostics"></div>
+    </div>
+
+    <script>
+        // Display browser information
+        function displayBrowserInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Browser Language': navigator.language,
+                'Platform': navigator.platform,
+                'Cookies Enabled': navigator.cookieEnabled,
+                'Online Status': navigator.onLine,
+                'Current URL': window.location.href,
+                'Referrer': document.referrer || 'None'
+            };
+
+            let html = '<table style="width: 100%; color: #fff;">';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<tr><td style="padding: 5px; font-weight: bold;">${key}:</td><td style="padding: 5px;">${value}</td></tr>`;
+            }
+            html += '</table>';
+            
+            document.getElementById('browserInfo').innerHTML = html;
+        }
+
+        // Test node connections
+        async function testConnection(url, name) {
+            const resultsDiv = document.getElementById('connectionResults');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                
+                const status = response.ok ? 'success' : 'error';
+                const message = response.ok ? 
+                    `✅ ${name} is accessible (${response.status})` : 
+                    `❌ ${name} returned ${response.status}`;
+                
+                resultsDiv.innerHTML += `<div class="status ${status}">${message}</div>`;
+                
+                if (response.ok) {
+                    const headers = {};
+                    for (let [key, value] of response.headers) {
+                        headers[key] = value;
+                    }
+                    resultsDiv.innerHTML += `<pre>Headers: ${JSON.stringify(headers, null, 2)}</pre>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="status error">❌ ${name} failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testStreamerNode() {
+            document.getElementById('connectionResults').innerHTML = '<h3>Testing Streamer Node...</h3>';
+            await testConnection('http://localhost:8080/health', 'Streamer Health');
+            await testConnection('http://localhost:8080/api/node/info', 'Streamer Info');
+        }
+
+        async function testViewerNode() {
+            document.getElementById('connectionResults').innerHTML = '<h3>Testing Viewer Node...</h3>';
+            await testConnection('http://localhost:8081/health', 'Viewer Health');
+            await testConnection('http://localhost:8081/api/node/info', 'Viewer Info');
+        }
+
+        async function testWebSocket() {
+            const resultsDiv = document.getElementById('connectionResults');
+            resultsDiv.innerHTML = '<h3>Testing WebSocket Connection...</h3>';
+            
+            try {
+                const ws = new WebSocket('ws://localhost:8081/ws');
+                
+                ws.onopen = function() {
+                    resultsDiv.innerHTML += '<div class="status success">✅ WebSocket connected successfully</div>';
+                    ws.close();
+                };
+                
+                ws.onerror = function(error) {
+                    resultsDiv.innerHTML += `<div class="status error">❌ WebSocket error: ${error}</div>`;
+                };
+                
+                ws.onclose = function() {
+                    resultsDiv.innerHTML += '<div class="status warning">⚠️ WebSocket connection closed</div>';
+                };
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="status error">❌ WebSocket failed: ${error.message}</div>`;
+            }
+        }
+
+        // Display diagnostic information
+        function displayDiagnostics() {
+            const diagnostics = {
+                'Local Storage Available': typeof(Storage) !== "undefined",
+                'Session Storage Available': typeof(sessionStorage) !== "undefined",
+                'WebSocket Support': typeof(WebSocket) !== "undefined",
+                'Fetch API Support': typeof(fetch) !== "undefined",
+                'Current Time': new Date().toISOString(),
+                'Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+
+            let html = '<table style="width: 100%; color: #fff;">';
+            for (const [key, value] of Object.entries(diagnostics)) {
+                const status = value ? '✅' : '❌';
+                html += `<tr><td style="padding: 5px; font-weight: bold;">${key}:</td><td style="padding: 5px;">${status} ${value}</td></tr>`;
+            }
+            html += '</table>';
+            
+            document.getElementById('diagnostics').innerHTML = html;
+        }
+
+        // Initialize page
+        window.onload = function() {
+            displayBrowserInfo();
+            displayDiagnostics();
+        };
+    </script>
+</body>
+</html>
+

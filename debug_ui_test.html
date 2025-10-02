@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug UI Test - Sutantra</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .console-output { background: #f0f0f0; padding: 10px; height: 300px; overflow-y: auto; font-family: monospace; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Sutantra UI Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Test WebSocket Handshake and UI Update</h2>
+        <button onclick="testNode(8080, 'streamer')">Test Node 1 (Streamer)</button>
+        <button onclick="testNode(8081, 'viewer')">Test Node 2 (Viewer)</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output:</h2>
+        <div id="console-output" class="console-output"></div>
+    </div>
+
+    <script>
+        let consoleDiv = document.getElementById('console-output');
+        
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleDiv.innerHTML += '<div style="color: blue;">' + args.join(' ') + '</div>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            consoleDiv.innerHTML += '<div style="color: red;">' + args.join(' ') + '</div>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+        
+        function testNode(port, expectedType) {
+            console.log(`\\n🧪 Testing Node on port ${port} (expected: ${expectedType})`);
+            console.log('='.repeat(50));
+            
+            const ws = new WebSocket(`ws://localhost:${port}/ws`);
+            
+            ws.onopen = function() {
+                console.log(`✅ WebSocket connected to port ${port}`);
+                
+                // Send handshake
+                const handshakeMsg = {
+                    type: 'handshake',
+                    data: { client_type: expectedType }
+                };
+                
+                console.log(`📤 Sending handshake:`, JSON.stringify(handshakeMsg));
+                ws.send(JSON.stringify(handshakeMsg));
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                console.log(`📥 Received message:`, JSON.stringify(message, null, 2));
+                
+                if (message.type === 'handshakeResponse') {
+                    console.log(`🎭 Node type from server: ${message.data?.node_type}`);
+                    console.log(`🆔 Node ID from server: ${message.data?.node_id}`);
+                    console.log(`🔌 Web port from server: ${message.data?.web_port}`);
+                    
+                    // Test if this matches expected
+                    const matches = message.data?.node_type === expectedType;
+                    console.log(`${matches ? '✅' : '❌'} Expected ${expectedType}, got ${message.data?.node_type}`);
+                }
+                
+                ws.close();
+            };
+            
+            ws.onerror = function(error) {
+                console.error(`❌ WebSocket error on port ${port}:`, error);
+            };
+            
+            ws.onclose = function() {
+                console.log(`🔌 WebSocket closed for port ${port}`);
+                console.log('='.repeat(50));
+            };
+        }
+        
+        console.log('🚀 Debug test page loaded');
+        console.log('Click the buttons above to test WebSocket handshake');
+    </script>
+</body>
+</html>
+

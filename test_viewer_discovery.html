@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Viewer Stream Discovery</title>
+</head>
+<body>
+    <h1>Test Viewer Stream Discovery</h1>
+    <button onclick="testDiscovery()">Test Stream Discovery</button>
+    <div id="result"></div>
+
+    <script>
+        async function testDiscovery() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                // Connect to viewer WebSocket (port 8081)
+                const ws = new WebSocket('ws://localhost:8081/ws');
+                
+                ws.onopen = () => {
+                    console.log('Connected to viewer WebSocket');
+                    
+                    // Send handshake
+                    ws.send(JSON.stringify({
+                        type: 'handshake',
+                        data: { node_type: 'viewer' }
+                    }));
+                };
+                
+                ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    console.log('Message:', message);
+                    
+                    if (message.type === 'handshakeResponse') {
+                        // Request stream list
+                        ws.send(JSON.stringify({
+                            type: 'requestStreamList',
+                            data: {}
+                        }));
+                    } else if (message.type === 'streamList') {
+                        const streams = message.data.streams || [];
+                        result.innerHTML = `Found ${streams.length} streams: ${JSON.stringify(streams, null, 2)}`;
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    result.innerHTML = `Error: ${error}`;
+                };
+                
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+

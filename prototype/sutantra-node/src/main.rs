@@ -6,6 +6,7 @@ mod blockchain;
 mod streaming;
 mod integration;
 mod mobile;
+mod web_simple;
 
 use crate::integration::SutantraNode;
 
@@ -33,6 +34,14 @@ enum Commands {
         /// Enable streaming relay
         #[arg(long, default_value = "true")]
         streaming: bool,
+        
+        /// Enable web UI server
+        #[arg(long)]
+        web_ui: bool,
+        
+        /// Web UI port
+        #[arg(long, default_value = "8080")]
+        web_port: u16,
     },
     
     /// Start a light node (mobile-optimized)
@@ -44,6 +53,14 @@ enum Commands {
         /// Bootstrap peers
         #[arg(long)]
         bootnodes: Vec<String>,
+        
+        /// Enable web UI server
+        #[arg(long)]
+        web_ui: bool,
+        
+        /// Web UI port
+        #[arg(long, default_value = "8080")]
+        web_port: u16,
     },
     
     /// Stream management commands
@@ -92,20 +109,50 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Start { port, validator, streaming } => {
+        Commands::Start { port, validator, streaming, web_ui, web_port } => {
             info!("🚀 Starting Sutantra full node on port {}", port);
             info!("📡 Validator mode: {}", validator);
             info!("🎥 Streaming relay: {}", streaming);
+            info!("🌐 Web UI: {} (port: {})", web_ui, web_port);
             
             let node = SutantraNode::new(port, validator, streaming).await?;
+            
+            if web_ui {
+                // Start simple web server in background
+                let event_sender = node.get_event_sender();
+                let streaming_sender = node.get_streaming_sender();
+                let web_server = crate::web_simple::SimpleWebServer::new(web_port, event_sender, streaming_sender);
+                
+                tokio::spawn(async move {
+                    if let Err(e) = web_server.start().await {
+                        warn!("Web server error: {}", e);
+                    }
+                });
+            }
+            
             node.run().await?;
         }
         
-        Commands::StartLight { port, bootnodes } => {
+        Commands::StartLight { port, bootnodes, web_ui, web_port } => {
             info!("📱 Starting Sutantra light node on port {}", port);
             info!("🔗 Bootstrap nodes: {:?}", bootnodes);
+            info!("🌐 Web UI: {} (port: {})", web_ui, web_port);
             
             let node = SutantraNode::new_light(port, bootnodes).await?;
+            
+            if web_ui {
+                // Start simple web server in background
+                let event_sender = node.get_event_sender();
+                let streaming_sender = node.get_streaming_sender();
+                let web_server = crate::web_simple::SimpleWebServer::new(web_port, event_sender, streaming_sender);
+                
+                tokio::spawn(async move {
+                    if let Err(e) = web_server.start().await {
+                        warn!("Web server error: {}", e);
+                    }
+                });
+            }
+            
             node.run().await?;
         }
         

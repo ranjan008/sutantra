@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stream Refresh Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-box { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        button { padding: 10px; margin: 5px; }
+        .console { background: #f5f5f5; padding: 10px; height: 300px; overflow-y: auto; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Stream Refresh Test</h1>
+    
+    <div class="test-box">
+        <h2>Test Stream Discovery</h2>
+        <button onclick="testStreamRefresh(8080)">Test Streamer (8080)</button>
+        <button onclick="testStreamRefresh(8081)">Test Viewer (8081)</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div class="test-box">
+        <h2>Console Output:</h2>
+        <div id="console" class="console"></div>
+    </div>
+
+    <script>
+        let consoleDiv = document.getElementById('console');
+        
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleDiv.innerHTML += '<div style="color: blue;">' + args.join(' ') + '</div>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            consoleDiv.innerHTML += '<div style="color: red;">' + args.join(' ') + '</div>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+        
+        function testStreamRefresh(port) {
+            console.log(`\\n🧪 Testing stream refresh on port ${port}`);
+            console.log('='.repeat(50));
+            
+            const ws = new WebSocket(`ws://localhost:${port}/ws`);
+            
+            ws.onopen = function() {
+                console.log(`✅ WebSocket connected to port ${port}`);
+                
+                // First send handshake
+                const handshake = {
+                    type: 'handshake',
+                    data: { client_type: 'test' }
+                };
+                
+                console.log('📤 Sending handshake...');
+                ws.send(JSON.stringify(handshake));
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                console.log(`📥 Received:`, JSON.stringify(message, null, 2));
+                
+                if (message.type === 'handshakeResponse') {
+                    console.log('🤝 Handshake successful, now requesting stream list...');
+                    
+                    // Now request stream list
+                    const streamRequest = {
+                        type: 'requestStreamList',
+                        data: {}
+                    };
+                    
+                    console.log('📤 Sending stream list request...');
+                    ws.send(JSON.stringify(streamRequest));
+                } else if (message.type === 'streamList') {
+                    console.log('📺 Stream list received!');
+                    console.log('📺 Streams:', message.data?.streams);
+                    
+                    if (message.data?.streams?.length > 0) {
+                        console.log('✅ SUCCESS: Found streams!');
+                    } else {
+                        console.log('⚠️  No streams found (this might be expected)');
+                    }
+                    
+                    ws.close();
+                }
+            };
+            
+            ws.onerror = function(error) {
+                console.error(`❌ WebSocket error on port ${port}:`, error);
+            };
+            
+            ws.onclose = function() {
+                console.log(`🔌 WebSocket closed for port ${port}`);
+                console.log('='.repeat(50));
+            };
+        }
+        
+        console.log('🚀 Stream refresh test page loaded');
+        console.log('Click buttons above to test stream discovery');
+    </script>
+</body>
+</html>
+

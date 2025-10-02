@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutantra - Decentralized Live Streaming</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-broadcast-tower"></i>
+                <h1>Sutantra</h1>
+                <span class="subtitle">Decentralized Live Streaming</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" id="connectionStatus"></div>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Video Section -->
+            <section class="video-section">
+                <div class="video-container">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+                    <div class="video-overlay">
+                        <div class="stream-info">
+                            <div class="info-item">
+                                <i class="fas fa-eye"></i>
+                                <span id="viewerCount">0</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span id="quality">HD</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="streamTime">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls stream-controls">
+                    <button id="startStreamBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i>
+                        Start Stream
+                    </button>
+                    <button id="stopStreamBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-stop"></i>
+                        Stop Stream
+                    </button>
+                    <button id="settingsBtn" class="btn btn-outline">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+            </section>
+
+            <!-- Side Panel -->
+            <aside class="side-panel">
+                <!-- Available Streams (Viewer Mode) - Moved to top -->
+                <div class="panel-section" id="availableStreamsSection" style="display: none;">
+                    <h3><i class="fas fa-broadcast-tower"></i> Available Streams</h3>
+                    <div class="streams-controls">
+                        <button id="refreshStreamsBtn" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Streams
+                        </button>
+                    </div>
+                    <div id="streamsList" class="streams-list">
+                        <p class="no-streams">Click "Refresh Streams" to discover available streams.</p>
+                    </div>
+                </div>
+
+                <!-- Stream Settings -->
+                <div class="panel-section">
+                    <h3><i class="fas fa-video"></i> Stream Settings</h3>
+                    <div class="setting-group">
+                        <label for="qualitySelect">Quality:</label>
+                        <select id="qualitySelect">
+                            <option value="1080p">1080p (Full HD)</option>
+                            <option value="720p" selected>720p (HD)</option>
+                            <option value="480p">480p (SD)</option>
+                            <option value="360p">360p (Low)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="bitrateSlider">Bitrate: <span id="bitrateValue">2500</span> kbps</label>
+                        <input type="range" id="bitrateSlider" min="500" max="5000" value="2500" step="100">
+                    </div>
+                    <div class="setting-group">
+                        <label for="fpsSelect">Frame Rate:</label>
+                        <select id="fpsSelect">
+                            <option value="60">60 FPS</option>
+                            <option value="30" selected>30 FPS</option>
+                            <option value="24">24 FPS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Network Info -->
+                <div class="panel-section">
+                    <h3><i class="fas fa-network-wired"></i> Network</h3>
+                    <div class="network-stats">
+                        <div class="stat">
+                            <span class="stat-label">Upload:</span>
+                            <span id="uploadSpeed" class="stat-value">0 Mbps</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Latency:</span>
+                            <span id="latency" class="stat-value">0 ms</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Packet Loss:</span>
+                            <span id="packetLoss" class="stat-value">0%</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Jitter:</span>
+                            <span id="jitter" class="stat-value">0 ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUN Servers -->
+                <div class="panel-section">
+                    <h3><i class="fas fa-server"></i> STUN Servers</h3>
+                    <div class="stun-list">
+                        <div class="stun-server active" data-server="twilio">
+                            <i class="fas fa-circle"></i>
+                            <span>Twilio</span>
+                        </div>
+                        <div class="stun-server active" data-server="metered">
+                            <i class="fas fa-circle"></i>
+                            <span>Metered</span>
+                        </div>
+                        <div class="stun-server active" data-server="cloudflare">
+                            <i class="fas fa-circle"></i>
+                            <span>Cloudflare</span>
+                        </div>
+                        <div class="stun-server active" data-server="google">
+                            <i class="fas fa-circle"></i>
+                            <span>Google</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blockchain Info -->
+                <div class="panel-section">
+                    <h3><i class="fas fa-cube"></i> Blockchain</h3>
+                    <div class="blockchain-stats">
+                        <div class="stat">
+                            <span class="stat-label">Block Height:</span>
+                            <span id="blockHeight" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Node ID:</span>
+                            <span id="nodeId" class="stat-value">sutantra-node-1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Peers:</span>
+                            <span id="peerCount" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Sutantra - Decentralized Live Streaming Platform</p>
+                <div class="footer-links">
+                    <a href="#" onclick="showAbout()">About</a>
+                    <a href="#" onclick="showHelp()">Help</a>
+                    <a href="https://github.com/sutantra/sutantra" target="_blank">GitHub</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Advanced Settings</h2>
+                <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="nodeUrl">Node URL:</label>
+                    <input type="text" id="nodeUrl" value="ws://localhost:30333" placeholder="ws://localhost:30333">
+                </div>
+                <div class="setting-group">
+                    <label for="streamKey">Stream Key:</label>
+                    <input type="text" id="streamKey" placeholder="Optional stream key">
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enableP2P" checked>
+                        Enable P2P Streaming
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enableBlockchain" checked>
+                        Enable Blockchain Integration
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('settingsModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Connecting to Sutantra node...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/webrtc-client.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
